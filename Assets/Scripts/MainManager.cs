@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,6 +10,9 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
+
+    public Button BackToMenuButton;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -36,6 +38,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        UpdateBestScoreText();
+        BackToMenuButton.gameObject.SetActive(true);
     }
 
     private void Update()
@@ -44,6 +48,7 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                BackToMenuButton.gameObject.SetActive(false);
                 m_Started = true;
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
@@ -59,6 +64,7 @@ public class MainManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
+            BackToMenuButton.gameObject.SetActive(true);
         }
     }
 
@@ -72,5 +78,25 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        if(DataManager.Instance && m_Points > DataManager.Instance.HighestScore)
+        {
+            DataManager.Instance.HighestScore = m_Points;
+            DataManager.Instance.HighestScoreName = DataManager.Instance.PlayerName;
+            
+            DataManager.Instance.SaveDataToFile();
+            UpdateBestScoreText();
+        }
+    }
+    private void UpdateBestScoreText()
+    {
+        if(DataManager.Instance && DataManager.Instance.HighestScoreName != null)
+        {
+            BestScoreText.text = "Best Score:" + DataManager.Instance.HighestScoreName + ":" + DataManager.Instance.HighestScore;
+        }
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
