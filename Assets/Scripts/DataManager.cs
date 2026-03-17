@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class DataManager : MonoBehaviour
 {
-    public static DataManager Instance;
+    public static DataManager Instance { get; private set; }
     public string PlayerName;
     public string HighestScoreName;
     public int HighestScore;
